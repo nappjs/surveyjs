@@ -1,2 +1,3 @@
 # surveyjs
-SurveyJS implementation connected to API (GraphQL)
+
+SurveyJS implementation connected to API (Rest, GraphQL)
