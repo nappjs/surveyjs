@@ -9,7 +9,7 @@ var props = {
 };
 var querystring = $.buildQuerystring(props);
 
-$.get(CONFIG.API_URL + "surveys/" + surveyUID + "?" + querystring, function(
+$.get(CONFIG.API_URL + "/surveys/" + surveyUID + "?" + querystring, function(
   data
 ) {
   editor.text = JSON.stringify(data);

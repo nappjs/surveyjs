@@ -10,7 +10,7 @@ var props = {
 };
 var querystring = $.buildQuerystring(props);
 
-$.get(CONFIG.API_URL + "surveys/" + surveyUID + "?" + querystring, function(
+$.get(CONFIG.API_URL + "/surveys/" + surveyUID + "?" + querystring, function(
   data
 ) {
   var survey = new Survey.Model(data);
@@ -33,7 +33,7 @@ $.get(CONFIG.API_URL + "surveys/" + surveyUID + "?" + querystring, function(
   });
 
   $.get(
-    "surveys/" + surveyUID + "/answers/" + answerUID + "?" + querystring,
+    "/surveys/" + surveyUID + "/answers/" + answerUID + "?" + querystring,
     function(data) {
       for (var key in data) {
         survey.setValue(key, data[key]);
@@ -45,7 +45,7 @@ $.get(CONFIG.API_URL + "surveys/" + surveyUID + "?" + querystring, function(
 var saveAnswers = function(result) {
   $.ajax({
     method: "PUT",
-    url: "surveys/" + surveyUID + "/answers/" + answerUID + "?" + querystring,
+    url: "/surveys/" + surveyUID + "/answers/" + answerUID + "?" + querystring,
     contentType: "application/json; charset=utf-8",
     data: JSON.stringify(result.data)
   })
