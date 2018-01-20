@@ -33,7 +33,13 @@ $.get(CONFIG.API_URL + "/surveys/" + surveyUID + "?" + querystring, function(
   });
 
   $.get(
-    "/surveys/" + surveyUID + "/answers/" + answerUID + "?" + querystring,
+    CONFIG.API_URL +
+      "/surveys/" +
+      surveyUID +
+      "/answers/" +
+      answerUID +
+      "?" +
+      querystring,
     function(data) {
       for (var key in data) {
         survey.setValue(key, data[key]);
