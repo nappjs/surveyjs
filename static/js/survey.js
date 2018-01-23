@@ -1,5 +1,5 @@
-Survey.Survey.cssType = "bootstrap";
-Survey.defaultBootstrapCss.navigationButton = "btn btn-green";
+// Survey.Survey.cssType = "bootstrap";
+// Survey.defaultBootstrapCss.navigationButton = "btn btn-green";
 
 var CONFIG = window.CONFIG;
 var surveyUID = $.url().param("survey");
@@ -15,8 +15,8 @@ $.get(CONFIG.API_URL + "/surveys/" + surveyUID + "?" + querystring, function(
 ) {
   var survey = new Survey.Model(data);
   survey.onComplete.add(saveAnswers);
-  survey.onComplete.add(function() {
-    console.log("data???", survey.data);
+  survey.onValueChanged.add(function(result) {
+    scheduleSave(result);
   });
 
   var converter = new showdown.Converter();
@@ -48,17 +48,33 @@ $.get(CONFIG.API_URL + "/surveys/" + surveyUID + "?" + querystring, function(
   );
 });
 
-var saveAnswers = function(result) {
+var saveTimeoutInterval = null;
+var scheduleSave = function(result) {
+  if (saveTimeoutInterval) clearTimeout(saveTimeoutInterval);
+  saveTimeoutInterval = setTimeout(function() {
+    saveAnswers(result);
+  }, 1000);
+};
+
+var saveAnswers = function(result, completed) {
+  var data = Object.assign({}, result.data, { completed: completed });
   $.ajax({
     method: "PUT",
-    url: "/surveys/" + surveyUID + "/answers/" + answerUID + "?" + querystring,
+    url:
+      CONFIG.API_URL +
+      "/surveys/" +
+      surveyUID +
+      "/answers/" +
+      answerUID +
+      "?" +
+      querystring,
     contentType: "application/json; charset=utf-8",
-    data: JSON.stringify(result.data)
+    data: JSON.stringify(data)
   })
     .done(function() {
-      alert("saved");
+      if (completed) alert("saved");
     })
     .fail(function() {
-      alert("failed to save");
+      if (completed) alert("failed to save");
     });
 };
