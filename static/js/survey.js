@@ -14,7 +14,9 @@ $.get(CONFIG.API_URL + "/surveys/" + surveyUID + "?" + querystring, function(
   data
 ) {
   var survey = new Survey.Model(data);
-  survey.onComplete.add(saveAnswers);
+  survey.onComplete.add(result => {
+    saveAnswers(result, true);
+  });
   survey.onValueChanged.add(function(result) {
     scheduleSave(result);
   });
