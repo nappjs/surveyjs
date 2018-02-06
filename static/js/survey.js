@@ -2,7 +2,6 @@
 // Survey.defaultBootstrapCss.navigationButton = "btn btn-green";
 
 var CONFIG = window.CONFIG;
-var surveyUID = $.url().param("survey");
 var answerUID = $.url().param("answer");
 
 var props = {
@@ -10,10 +9,9 @@ var props = {
 };
 var querystring = $.buildQuerystring(props);
 
-$.get(CONFIG.API_URL + "/surveys/" + surveyUID + "?" + querystring, function(
-  data
-) {
-  var survey = new Survey.Model(data);
+loadAnswerData(answerUID, function(err, data) {
+  if (err) return alert("failed to load answer");
+  var survey = new Survey.Model(data.survey.content);
   survey.onComplete.add(result => {
     saveAnswers(result, true);
   });
@@ -34,20 +32,10 @@ $.get(CONFIG.API_URL + "/surveys/" + surveyUID + "?" + querystring, function(
     completeHtml: "Thank you"
   });
 
-  $.get(
-    CONFIG.API_URL +
-      "/surveys/" +
-      surveyUID +
-      "/answers/" +
-      answerUID +
-      "?" +
-      querystring,
-    function(data) {
-      for (var key in data) {
-        survey.setValue(key, data[key]);
-      }
-    }
-  );
+  let content = JSON.parse(data.content);
+  for (var key in content) {
+    survey.setValue(key, content[key]);
+  }
 });
 
 var saveTimeoutInterval = null;
@@ -59,24 +47,11 @@ var scheduleSave = function(result) {
 };
 
 var saveAnswers = function(result, completed) {
-  var data = Object.assign({}, result.data, { completed: completed });
-  $.ajax({
-    method: "PUT",
-    url:
-      CONFIG.API_URL +
-      "/surveys/" +
-      surveyUID +
-      "/answers/" +
-      answerUID +
-      "?" +
-      querystring,
-    contentType: "application/json; charset=utf-8",
-    data: JSON.stringify(data)
-  })
-    .done(function() {
-      if (completed) alert("saved");
-    })
-    .fail(function() {
-      if (completed) alert("failed to save");
-    });
+  var data = { content: JSON.stringify(result.data), completed: completed };
+  saveAnswerData(answerUID, data, function(err) {
+    if (completed) {
+      if (err) return alert("failed to save");
+      alert("saved");
+    }
+  });
 };

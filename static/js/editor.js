@@ -9,26 +9,32 @@ var props = {
 };
 var querystring = $.buildQuerystring(props);
 
-$.get(CONFIG.API_URL + "/surveys/" + surveyUID + "?" + querystring, function(
-  data
-) {
-  editor.text = JSON.stringify(data);
-});
-
 var editorOptions = {};
 var editor = new SurveyEditor.SurveyEditor("editorElement", editorOptions);
 
-editor.saveSurveyFunc = function() {
-  $.ajax({
-    method: "PUT",
-    url: CONFIG.API_URL + "/surveys/" + surveyUID + "?" + querystring,
-    contentType: "application/json; charset=utf-8",
-    data: JSON.stringify(JSON.parse(editor.text))
-  })
-    .done(function(data) {
-      alert("saved");
-    })
-    .fail(function() {
-      alert("failed to save");
+loadSurveyData(surveyUID, function(err, data) {
+  // properties
+  for (var i in data.propertyGroups) {
+    var group = data.propertyGroups[i];
+    Survey.JsonObject.metaData.addProperty("questionbase", {
+      name: group.code + ":multiplevalues",
+      choices: group.properties.map(function(p) {
+        return { value: p.code, text: p.name };
+      })
     });
+  }
+
+  // editor content
+  editor.text = data.content;
+});
+
+editor.saveSurveyFunc = function() {
+  sendQuery(
+    "mutation($id:Int!,$content:String!){updateSurvey(id:$id,input:{content:$content}){id}}",
+    { id: surveyUID, content: JSON.stringify(JSON.parse(editor.text)) },
+    function(err, result) {
+      if (err) alert("failed to save");
+      else alert("saved");
+    }
+  );
 };
