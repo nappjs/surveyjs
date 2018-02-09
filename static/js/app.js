@@ -20,29 +20,29 @@ function sendQuery(query, variables, callback) {
 
 function loadSurveyData(uid, callback) {
   sendQuery(
-    "query($id:Int!){survey(id:$id){content propertyGroups{code name properties{code name}}}}",
-    { id: uid },
+    "query($uid:String!){surveyByUID(uid:$uid){content propertyGroups{code name properties{code name}}}}",
+    { uid: uid },
     function(err, result) {
       if (err) return callback(err);
-      callback(null, result.data.survey);
+      callback(null, result.data.surveyByUID);
     }
   );
 }
 
 function loadAnswerData(uid, callback) {
   sendQuery(
-    "query($id:Int!){surveyAnswer(id:$id){content survey {content}}}",
-    { id: uid },
+    "query($uid:String!){surveyAnswerByUID(uid:$uid){content survey {content}}}",
+    { uid: uid },
     function(err, result) {
       if (err) return callback(err);
-      callback(null, result.data.surveyAnswer);
+      callback(null, result.data.surveyAnswerByUID);
     }
   );
 }
 function saveAnswerData(uid, data, callback) {
   sendQuery(
-    "mutation($id:Int!,$content:String!,$completed:Boolean!){updateSurveyAnswer(id:$id,input:{completed:$completed,content:$content}){id}}",
-    { id: uid, content: data.content, completed: data.completed || false },
+    "mutation($uid:String!,$content:String!,$completed:Boolean!){updateSurveyAnswerByUID(uid:$uid,input:{completed:$completed,content:$content}){uid}}",
+    { uid: uid, content: data.content, completed: data.completed || false },
     callback
   );
 }

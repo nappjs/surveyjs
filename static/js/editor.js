@@ -30,8 +30,8 @@ loadSurveyData(surveyUID, function(err, data) {
 
 editor.saveSurveyFunc = function() {
   sendQuery(
-    "mutation($id:Int!,$content:String!){updateSurvey(id:$id,input:{content:$content}){id}}",
-    { id: surveyUID, content: JSON.stringify(JSON.parse(editor.text)) },
+    "mutation($uid:String!,$content:String!){updateSurveyByUID(uid:$uid,input:{content:$content}){uid}}",
+    { uid: surveyUID, content: JSON.stringify(JSON.parse(editor.text)) },
     function(err, result) {
       if (err) alert("failed to save");
       else alert("saved");
