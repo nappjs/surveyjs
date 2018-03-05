@@ -31,7 +31,7 @@ function loadSurveyData(uid, callback) {
 
 function loadAnswerData(uid, callback) {
   sendQuery(
-    "query($uid:String!){surveyAnswerByUID(uid:$uid){content survey {content}}}",
+    "query($uid:String!){surveyAnswerByUID(uid:$uid){content sent survey {content}}}",
     { uid: uid },
     function(err, result) {
       if (err) return callback(err);
@@ -41,8 +41,12 @@ function loadAnswerData(uid, callback) {
 }
 function saveAnswerData(uid, data, callback) {
   sendQuery(
-    "mutation($uid:String!,$content:String!,$completed:Boolean!){updateSurveyAnswerByUID(uid:$uid,input:{completed:$completed,content:$content}){uid}}",
-    { uid: uid, content: data.content, completed: data.completed || false },
+    "mutation($uid:String!,$content:String!,$sent:String){updateSurveyAnswerByUID(uid:$uid,input:{sent:$sent,content:$content}){uid}}",
+    {
+      uid: uid,
+      content: data.content,
+      sent: data.send ? new Date().toISOString() : undefined
+    },
     callback
   );
 }

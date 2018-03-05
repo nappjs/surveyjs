@@ -11,6 +11,12 @@ var querystring = $.buildQuerystring(props);
 
 loadAnswerData(answerUID, function(err, data) {
   if (err) return alert("failed to load answer");
+
+  if (data.sent) {
+    alert("You already completed this survey");
+    return;
+  }
+
   var survey = new Survey.Model(data.survey.content);
   survey.onComplete.add(result => {
     saveAnswers(result, true);
@@ -46,10 +52,10 @@ var scheduleSave = function(result) {
   }, 1000);
 };
 
-var saveAnswers = function(result, completed) {
-  var data = { content: JSON.stringify(result.data), completed: completed };
+var saveAnswers = function(result, send) {
+  var data = { content: JSON.stringify(result.data), send: send };
   saveAnswerData(answerUID, data, function(err) {
-    if (completed) {
+    if (send) {
       if (err) return alert("failed to save");
       alert("saved");
     }
